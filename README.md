@@ -31,3 +31,34 @@ Feature ranking performed with InfoGainAttributeEval + Ranker.
 | J48 (pruned) | 30 | 91.90% | 0.897 | 506 |
 
 RandomForest recommended for deployment; J48 retained for interpretability.
+
+## Descriptive Analysis — Cognos Dashboard
+
+Six visualisation elements built on the five highest information-gain
+features, plus overall class distribution. Filters applied on
+`age_of_domain`, `Google_Index` and `Domain_registeration_length`.
+
+### Findings
+
+**Certificate and anchor behaviour dominate.** `SSLfinal_State` and
+`URL_of_Anchor` produce sharp separations between phishing and legitimate
+sites. `web_traffic` and `having_Sub_Domain` produce much milder splits,
+visually confirming the information-gain ranking (0.499 and 0.477 versus
+0.115 and 0.110).
+
+**Anchor links: extremes carry the signal.** Sites with `URL_of_Anchor` =
+Phishing are almost entirely phishing (3,240 vs ~40). However, "Suspicious"
+anchor links are more common on legitimate sites (3,829 vs 1,505), so
+detection rules should trigger on extreme values rather than treating the
+middle category as a warning sign.
+
+**Domain age shifts the base rate.** Unfiltered, the dataset is 44.3%
+phishing (4,898 / 11,055). Filtered to domains under six months old
+(`age_of_domain` = Phishing), this rises to 50.7% (2,632 / 5,189). Domain
+age is a weak standalone predictor (information gain 0.011) but materially
+changes the prior probability, supporting a lower flagging threshold for
+newly registered domains.
+
+### Recommendation
+Prioritise SSL certificate validation and anchor-link analysis when writing
+detection rules. Apply stricter thresholds to recently registered domains.
